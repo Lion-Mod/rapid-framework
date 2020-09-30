@@ -1,6 +1,5 @@
 from cuml.preprocessing import LabelEncoder, OneHotEncoder
 import cudf
-from cudf.core.reshape import get_dummies
 from pandas import read_csv
 
 class CategoricalFeatures:
@@ -20,15 +19,19 @@ class CategoricalFeatures:
                        "label encoded": self.lbl_enc_feats,
                        "target encoded": self.target_enc_feats}
 
+      # If handle_na is True then fill NAs with "MISSING"
       if self.handle_na:
+          # If lbl_enc_feats is blank then fill any NASs with "MISSING"
           if self.lbl_enc_feats != None:
             for feat in self.lbl_enc_feats:
               self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
-
+          
+          # If ohe_feats is blank then fill any NASs with "MISSING"
           if self.ohe_feats != None:
             for feat in self.ohe_feats:
               self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
 
+          # If target_enc_feats is blank then fill any NASs with "MISSING"
           if self.target_enc_feats != None:
             for feat in self.target_enc_feats:
               self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
@@ -68,7 +71,7 @@ class CategoricalFeatures:
 
     
 
-    # Target encoder
+    # Target encoder (when released)
 
     def preprocess(self):
       """
