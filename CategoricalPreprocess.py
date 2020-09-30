@@ -1,15 +1,17 @@
 from cuml.preprocessing import LabelEncoder, OneHotEncoder
 import cudf
-from pandas import read_csv
+from itertools import chain
 
 # Preprocess categorical features using various encodings and fill missings
 class CategoricalFeatures:
     def __init__(self, df, lbl_enc_feats, ohe_feats, target_enc_feats, handle_na = False):
       """
-      df: pandas dataframe
-      categorical_features: list of column names
-      encoding_type: label, binary, ohe
-      handle_na: True/False
+      Params:
+      - df = cuDF dataframe
+      - lbl_enc_feats = list of features to label encode
+      - ohe_feats = list of features to one hot encode
+      - target_enc_feats = list of features to use for target encoding
+      - handle_na = True/False to indicate if you want to fill NAs
       """
       self.df = df
       self.lbl_enc_feats = lbl_enc_feats
@@ -40,12 +42,23 @@ class CategoricalFeatures:
         
       self.output_df = self.df.copy()
 
+    def rare_values(self, feat, min_percent = 0):
+
+      """
+      Merge rare values into one category called "RARE" for feature selected based upon percentage they make up in a column
+      Params:
+      - min_percent = the minimum percent a level has to have to be considered not "RARE"
+      """
+      a = self.df[feat].groupby(feat).count() / self.df[feat].count()
+
+      return a
+
     def one_hot_encoder(self, dummy_nas = None):
       """
       Takes the output_df and creates dummifies any features in ohe_feats list
 
       By default it won't dummy any NAs in the features but this can be tweaked to True to handle them
-      Params
+      Params:
       - dummy_nas = True/False (default to False), used to indicate if get_dummies will dummy NAs
       """
 
