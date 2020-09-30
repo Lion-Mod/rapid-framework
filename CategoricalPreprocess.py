@@ -4,7 +4,7 @@ from itertools import chain
 
 # Preprocess categorical features using various encodings and fill missings
 class CategoricalFeatures:
-    def __init__(self, df, lbl_enc_feats, ohe_feats, target_enc_feats, handle_na = False):
+    def __init__(self, df, ohe_feats, lbl_enc_feats, ohe_feats, target_enc_feats, handle_na = False):
       """
       Params:
       - df = cuDF dataframe
@@ -14,27 +14,35 @@ class CategoricalFeatures:
       - handle_na = True/False to indicate if you want to fill NAs
       """
       self.df = df
-      self.lbl_enc_feats = lbl_enc_feats
       self.ohe_feats = ohe_feats
+      self.lbl_enc_feats = lbl_enc_feats
+      self.ord_feats = ord_feats
       self.target_enc_feats = target_enc_feats
       self.handle_na = handle_na
-      self.encoders = {"one hot encoded": self.ohe_feats,
-                       "label encoded": self.lbl_enc_feats,
-                       "target encoded": self.target_enc_feats}
+      self.encoders = {"one hot encoded" : self.ohe_feats,
+                       "label encoded" : self.lbl_enc_feats,
+                       "ordinal encoded" : self.ord_feats 
+                       "target encoded" : self.target_enc_feats}
 
       # If handle_na is True then fill NAs with "MISSING"
       if self.handle_na:
-          # If lbl_enc_feats is blank then fill any NASs with "MISSING"
-          if self.lbl_enc_feats != None:
-            for feat in self.lbl_enc_feats:
-              self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
-          
-          # If ohe_feats is blank then fill any NASs with "MISSING"
+
+          # If there are features to ohe then fill any NASs with "MISSING"
           if self.ohe_feats != None:
             for feat in self.ohe_feats:
               self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
 
-          # If target_enc_feats is blank then fill any NASs with "MISSING"
+          # If there are features to label encode then fill any NASs with "MISSING"
+          if self.lbl_enc_feats != None:
+            for feat in self.lbl_enc_feats:
+              self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
+
+          # If there are ordinal features then fill any NASs with "MISSING"
+          if self.ohe_feats != None:
+            for feat in self.ohe_feats:
+              self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
+
+          # If there are features to target encode then fill any NASs with "MISSING"
           if self.target_enc_feats != None:
             for feat in self.target_enc_feats:
               self.df[feat] = self.df[feat].astype(str).fillna("MISSING")
@@ -82,7 +90,8 @@ class CategoricalFeatures:
         le.fit(self.output_df[feat])
         self.output_df[feat] = le.transform(self.output_df[feat])
 
-    def ordinal_encoder(self, )
+    def ordinal_encoder(self):
+      # FILL with loop + list + dict
     
 
     # Target encoder (when released)
