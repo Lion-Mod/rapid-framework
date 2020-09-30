@@ -2,6 +2,7 @@ from cuml.preprocessing import LabelEncoder, OneHotEncoder
 import cudf
 from pandas import read_csv
 
+# Preprocess categorical features using various encodings and fill missings
 class CategoricalFeatures:
     def __init__(self, df, lbl_enc_feats, ohe_feats, target_enc_feats, handle_na = False):
       """
@@ -84,3 +85,16 @@ class CategoricalFeatures:
       Returns a dictionary of the features and which encoder they fall under
       """ 
       return self.encoders
+
+# Preprocess continuous features using scalings, normalisation and fill missings
+class ContinuousFeatures:
+  def __init__(self, df, cont_feats, handle_na = False):
+    self.df = df
+    self.cont_feats = cont_feats
+
+    # If handle_na is True then fill NAs with -999999
+    if handle_na:
+      for feat in self.cont_feats:
+        self.df[feat] = self.df[feat].astype(str).fillna(-999999)
+
+    self.output_df = self.df.copy()
