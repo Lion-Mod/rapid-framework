@@ -43,15 +43,14 @@ class CategoricalFeatures:
       self.output_df = self.df.copy()
 
     def rare_values(self, feat, min_percent = 0):
-
       """
       Merge rare values into one category called "RARE" for feature selected based upon percentage they make up in a column
       Params:
       - min_percent = the minimum percent a level has to have to be considered not "RARE"
+      - feat = feature in df to check if rare values exist
       """
-      a = self.df[feat].groupby(feat).count() / self.df[feat].count()
 
-      return a
+      self.output_df.loc[self.output_df[feat].value_counts()[self.output_df[feat]].values / self.output_df[feat].count() <= min_percent, feat] = "RARE"
 
     def one_hot_encoder(self, dummy_nas = None):
       """
@@ -83,6 +82,7 @@ class CategoricalFeatures:
         le.fit(self.output_df[feat])
         self.output_df[feat] = le.transform(self.output_df[feat])
 
+    def ordinal_encoder(self, )
     
 
     # Target encoder (when released)
