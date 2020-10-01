@@ -166,9 +166,12 @@ class DatetimeFeatures:
     ['year', 'month', 'week', 'day', 'weekday', 'dayofyear', 'is_month_end', 'is_month_start', 
     'is_quarter_end', 'is_quarter_start', 'is_year_end', 'is_year_start', 'elapsed']
     """
+    # Get the date column and initialise the units need for sin/cos transforms
     date_feat = self.df[date_feat]
     units = 0
 
+    # Below each if looks at the date_part and returns the appropriate date part
+    # YEAR, raise exception if sin_cos_transform is True
     if date_part == "year":
       if sin_cos_transform == True:
         raise Exception("Can't have cyclical years.")
@@ -176,34 +179,43 @@ class DatetimeFeatures:
       else:
         add_date_col = date_feat.dt.year
 
+    # MONTH
     elif date_part == "month":
       add_date_col = date_feat.dt.month
       units = 12
 
+    # WEEK OF THE YEAR
     elif date_part == "week":
       add_date_col = date_feat.dt.week
       units = 52
     
+    # DAY OF THE MONTH
     elif date_part == "day":
       add_date_col = date_feat.dt.day
       # Depends on month again
       #units = dependent, cyclical ness will have to be considered
 
+    # WEEKDAY
     elif date_part == "weekday":
       add_date_col = date_feat.dt.weekday
       units = 7
 
+    # IF ITS THE START OF THE MONTH
     elif date_part == "is_month_start":
       add_date_col = date_feat.dt.day.replace(to_replace = [2, 31], value = 0)
       units = 12
 
+    # IF ITS THE END OF THE MONTH
     #elif date_part == "is_month_end":
     #  print(date_feat.dt.is_month_end)
 
+    # If sin_cos_transform is True then create two new columns sin_/cos_ suffixed with the date_part
+    # Transform use cudfs sin/cos
     if sin_cos_transform == True:
       self.output_df["sin_" + date_part] = cudf.sin((2 * 3.14 * (add_date_col)) / units)
       self.output_df["cos_" + date_part] = cudf.cos((2 * 3.14 * (add_date_col)) / units)
     
+    # If False then don't do the transform
     else:
       self.output_df[date_part] = add_date_col
       
