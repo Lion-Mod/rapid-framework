@@ -1,15 +1,13 @@
-from cuml.preprocessing import LabelEncoder, OneHotEncoder
-import cudf
-from itertools import chain
 
 # Preprocess categorical features using various encodings and fill missings
 class CategoricalFeatures:
-    def __init__(self, df, ohe_feats, lbl_enc_feats, ohe_feats, target_enc_feats, handle_na = False):
+    def __init__(self, df, ohe_feats, lbl_enc_feats, ord_feats, target_enc_feats, handle_na = False):
       """
       Params:
       - df = cuDF dataframe
-      - lbl_enc_feats = list of features to label encode
       - ohe_feats = list of features to one hot encode
+      - lbl_enc_feats = list of features to label encode
+      - ord_feats = dictionary of {"feature": [order of unique values] to ordinally encode}
       - target_enc_feats = list of features to use for target encoding
       - handle_na = True/False to indicate if you want to fill NAs
       """
@@ -21,7 +19,7 @@ class CategoricalFeatures:
       self.handle_na = handle_na
       self.encoders = {"one hot encoded" : self.ohe_feats,
                        "label encoded" : self.lbl_enc_feats,
-                       "ordinal encoded" : self.ord_feats 
+                       "ordinal encoded" : self.ord_feats, 
                        "target encoded" : self.target_enc_feats}
 
       # If handle_na is True then fill NAs with "MISSING"
@@ -92,7 +90,8 @@ class CategoricalFeatures:
 
     def ordinal_encoder(self):
       # FILL with loop + list + dict
-    
+      for feat in list(self.ord_feats.keys()):
+        self.output_df[feat] = self.df[feat].label_encoding(cats = self.ord_feats[feat])  
 
     # Target encoder (when released)
 
