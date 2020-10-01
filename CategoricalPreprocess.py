@@ -138,14 +138,37 @@ class DatetimeFeatures:
     self.output_df = self.df.copy()
 
 
-  def explode_date(self, date_feat, date_parts, sin_cos_transform = False):
+  def explode_date(self, date_feat, date_part, sin_cos_transform = False):
     """
     Explodes each date_feats into the date_parts
 
     Potential date parts are
-    ['Year', 'Month', 'Week', 'Day', 'Dayofweek', 'Dayofyear', 'Is_month_end', 'Is_month_start', 
-    'Is_quarter_end', 'Is_quarter_start', 'Is_year_end', 'Is_year_start', 'Elapsed']
+    ['year', 'month', 'week', 'day', 'weekday', 'dayofyear', 'is_month_end', 'is_month_start', 
+    'is_quarter_end', 'is_quarter_start', 'is_year_end', 'is_year_start', 'elapsed']
     """
+    date_feat = self.df[date_feat]
 
-    if date_parts == "Year":
-      self.output_df["Year"] = self.df[date_feat].dt.year
+
+    if date_part == "year":
+      add_date_col = date_feat.dt.year
+
+    elif date_part == "month":
+      add_date_col = date_feat.dt.month
+
+    elif date_part == "week":
+      add_date_col = date_feat.dt.week
+    
+    elif date_part == "day":
+      add_date_col = date_feat.dt.day
+
+    elif date_part == "weekday":
+      add_date_col = date_feat.dt.weekday
+
+    elif date_part == "is_month_start":
+      add_date_col = date_feat.dt.day.replace(to_replace = [2, 31], value = 0)
+
+    elif date_part == "is_month_end":
+      if date_feat.dt.month in [10]:
+        add_date_col = date_feat.dt.day.replace(to_replace = [1, 29], value = 0)
+
+    #self.output_df[date_part] = add_date_col
