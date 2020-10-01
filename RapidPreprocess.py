@@ -5,6 +5,8 @@ import cudf
 class CategoricalFeatures:
     def __init__(self, df, ohe_feats, lbl_enc_feats, ord_feats, target_enc_feats, handle_na = False):
       """
+      Used to handle missing values, rare values and multiple encoding types with categorical features
+
       Params:
       - df = cuDF dataframe
       - ohe_feats = list of features to one hot encode
@@ -116,6 +118,14 @@ class CategoricalFeatures:
 # Preprocess continuous features using fill missings
 class ContinuousFeatures:
   def __init__(self, df, cont_feats, handle_na = False):
+    """
+    Used to fill missing values of continous feats with -999999
+
+    Params:
+    - df = cuDF dataframe
+    - cont_feats = list of continuous features
+    - handle_na = True/False on whether or not to fill NAs
+    """
     self.df = df
     self.cont_feats = cont_feats
 
@@ -126,17 +136,27 @@ class ContinuousFeatures:
 
     self.output_df = self.df.copy()
 
+  def preprocess(self):
+    return self.output_df   
+
 # Preprocess datetime features by exploding datetimes
 class DatetimeFeatures:
   def __init__(self, df, date_or_datetime_feats):
+    """
+    Used to explode dates and convert any non converted dates to datetime64 ns
+    
+    Params:
+    - df = cuDF dataframe
+    - date_or_datetime_feats = list of date or datetime features
+    """
     self.df = df
     self.date_or_datetime_feats = date_or_datetime_feats
     
+    # Convert all date_or_datetime_feats to datetimes in ns
     for feat in date_or_datetime_feats:
       self.df[feat] = self.df[feat].astype("datetime64[ns]")
     
     self.output_df = self.df.copy()
-
 
   def explode_date(self, date_feat, date_part, sin_cos_transform = False):
     """
@@ -147,28 +167,46 @@ class DatetimeFeatures:
     'is_quarter_end', 'is_quarter_start', 'is_year_end', 'is_year_start', 'elapsed']
     """
     date_feat = self.df[date_feat]
-
+    units = 0
 
     if date_part == "year":
-      add_date_col = date_feat.dt.year
+      if sin_cos_transform == True:
+        raise Exception("Can't have cyclical years.")
+      
+      else:
+        add_date_col = date_feat.dt.year
 
     elif date_part == "month":
       add_date_col = date_feat.dt.month
+      units = 12
 
     elif date_part == "week":
       add_date_col = date_feat.dt.week
+      units = 52
     
     elif date_part == "day":
       add_date_col = date_feat.dt.day
+      # Depends on month again
+      #units = dependent, cyclical ness will have to be considered
 
     elif date_part == "weekday":
       add_date_col = date_feat.dt.weekday
+      units = 7
 
     elif date_part == "is_month_start":
       add_date_col = date_feat.dt.day.replace(to_replace = [2, 31], value = 0)
+      units = 12
 
-    elif date_part == "is_month_end":
-      if date_feat.dt.month in [10]:
-        add_date_col = date_feat.dt.day.replace(to_replace = [1, 29], value = 0)
+    #elif date_part == "is_month_end":
+    #  print(date_feat.dt.is_month_end)
 
-    #self.output_df[date_part] = add_date_col
+    if sin_cos_transform == True:
+      self.output_df["sin_" + date_part] = cudf.sin((2 * 3.14 * (add_date_col)) / units)
+      self.output_df["cos_" + date_part] = cudf.cos((2 * 3.14 * (add_date_col)) / units)
+    
+    else:
+      self.output_df[date_part] = add_date_col
+      
+
+  def preprocess(self):
+    return self.output_df
