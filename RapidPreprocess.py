@@ -179,6 +179,8 @@ class DatetimeFeatures:
       else:
         add_date_col = date_feat.dt.year
 
+    # QUARTER
+
     # MONTH
     elif date_part == "month":
       add_date_col = date_feat.dt.month
@@ -205,7 +207,7 @@ class DatetimeFeatures:
       add_date_col = date_feat.dt.day.replace(to_replace = [2, 31], value = 0)
       units = 12
 
-    # IF ITS THE END OF THE MONTH
+    # END OF THE MONTH
     #elif date_part == "is_month_end":
     #  print(date_feat.dt.is_month_end)
 
