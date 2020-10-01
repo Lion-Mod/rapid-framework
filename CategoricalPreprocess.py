@@ -1,3 +1,5 @@
+from cuml.preprocessing import LabelEncoder, OneHotEncoder
+import cudf
 
 # Preprocess categorical features using various encodings and fill missings
 class CategoricalFeatures:
@@ -81,15 +83,19 @@ class CategoricalFeatures:
 
     def label_encoder(self):
       """
-      Takes the output_df and label encode any featrues in lbl_enc_feats list
+      Takes the output_df and label encode any features in lbl_enc_feats list
       """  
+      # Loop through each feature in lbl_enc_feats and label encode it
       for feat in self.lbl_enc_feats:
         le = LabelEncoder()
         le.fit(self.output_df[feat])
         self.output_df[feat] = le.transform(self.output_df[feat])
 
     def ordinal_encoder(self):
-      # FILL with loop + list + dict
+      """
+      Takes the output_df and ordinaly encodes the features in ord_feats using the order provided per feature
+      """
+      # Loop through each ordinal feature in ord_feats (the keys are the features) and perform ordinal encoding
       for feat in list(self.ord_feats.keys()):
         self.output_df[feat] = self.df[feat].label_encoding(cats = self.ord_feats[feat])  
 
@@ -107,7 +113,7 @@ class CategoricalFeatures:
       """ 
       return self.encoders
 
-# Preprocess continuous features using scalings, normalisation and fill missings
+# Preprocess continuous features using fill missings
 class ContinuousFeatures:
   def __init__(self, df, cont_feats, handle_na = False):
     self.df = df
@@ -119,3 +125,27 @@ class ContinuousFeatures:
         self.df[feat] = self.df[feat].astype(str).fillna(-999999)
 
     self.output_df = self.df.copy()
+
+# Preprocess datetime features by exploding datetimes
+class DatetimeFeatures:
+  def __init__(self, df, date_or_datetime_feats):
+    self.df = df
+    self.date_or_datetime_feats = date_or_datetime_feats
+    
+    for feat in date_or_datetime_feats:
+      self.df[feat] = self.df[feat].astype("datetime64[ns]")
+    
+    self.output_df = self.df.copy()
+
+
+  def explode_date(self, date_feat, date_parts, sin_cos_transform = False):
+    """
+    Explodes each date_feats into the date_parts
+
+    Potential date parts are
+    ['Year', 'Month', 'Week', 'Day', 'Dayofweek', 'Dayofyear', 'Is_month_end', 'Is_month_start', 
+    'Is_quarter_end', 'Is_quarter_start', 'Is_year_end', 'Is_year_start', 'Elapsed']
+    """
+
+    if date_parts == "Year":
+      self.output_df["Year"] = self.df[date_feat].dt.year
