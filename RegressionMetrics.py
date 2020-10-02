@@ -1,5 +1,6 @@
 import cudf
 from cuml.metrics import mean_absolute_error, mean_squared_error, mean_squared_log_error, r2_score
+from math import sqrt
 
 class RegressionMetrics:
   def __init__(self):
@@ -18,23 +19,23 @@ class RegressionMetrics:
 
   @staticmethod
   def _mae(y_true, y_pred):
-    return mean_absolute_error(y_true=y_true, y_pred=y_pred)
+    return mean_absolute_error(y_true = y_true, y_pred = y_pred)
 
   @staticmethod
   def _msle(y_true, y_pred):
-    return mean_squared_log_error(y_true=y_true, y_pred=y_pred)
+    return mean_squared_log_error(y_true = y_true, y_pred = y_pred)
 
   @staticmethod
   def _mse(y_true, y_pred):
-    return mean_squared_error(y_true=y_true, y_pred=y_pred)
+    return mean_squared_error(y_true = y_true, y_pred = y_pred)
 
   def _rmsle(self, y_true, y_pred):
-    return cudf.sqrt(self._msle(y_true=y_true, y_pred=y_pred))
+    return sqrt(self._msle(y_true=y_true, y_pred=y_pred))
 
   def _rmse(self, y_true, y_pred):
-    return cudf.sqrt(self._mse(y_true=y_true, y_pred=y_pred))
+    return sqrt(self._mse(y_true=y_true, y_pred=y_pred))
 
   @staticmethod
   def _r2(y_true, y_pred):
-    return r2_score(y_true=y_true, y_pred=y_pred)
+    return r2_score(y_true = y_true, y_pred = y_pred)
   
