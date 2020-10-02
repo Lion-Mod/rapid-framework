@@ -134,6 +134,8 @@ class ContinuousFeatures:
       for feat in self.cont_feats:
         self.df[feat] = self.df[feat].astype(str).fillna(-999999)
 
+    # Possible scaler here using .scale
+        
     self.output_df = self.df.copy()
 
   def preprocess(self):
