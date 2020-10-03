@@ -41,7 +41,7 @@ class RegressionModels:
     preds = fit_elastic_net.predict(self.X_test)
   
   # Mini batch SGD
-  def MBSGD_reg(self, loss = 'squared_loss', penalty = 'l2', alpha = 0.0001, l1_ratio = 0.15, fit_intercept = True, epochs = 1000, tol = 0.001, shuffle = True, 
+  def MBSGD_regression(self, loss = 'squared_loss', penalty = 'l2', alpha = 0.0001, l1_ratio = 0.15, fit_intercept = True, epochs = 1000, tol = 0.001, shuffle = True, 
                          learning_rate = 'constant', eta0 = 0.001, power_t = 0.5, batch_size = 32, n_iter_no_change = 5, handle = None, verbose = False, output_type = None):
     MBSGD_reg = MBSGDRegressor(loss, penalty, alpha, l1_ratio, fit_intercept, epochs, tol, shuffle, learning_rate, eta0, power_t, batch_size, n_iter_no_change, handle, verbose, output_type)
     
@@ -50,7 +50,7 @@ class RegressionModels:
     preds = fit_MBSGD_reg.predict(self.X_test)
 
   # KNN
-  def KNN_reg(self, weights = 'uniform', n_neighbors = 5, verbose = False, algorithm = "brute", metric = "euclidean", weights = "uniform"):
+  def KNN_regression(self, weights = 'uniform', n_neighbors = 5, verbose = False, algorithm = "brute", metric = "euclidean", weights = "uniform"):
     KNN_reg = KNeighborsRegressor(weights, n_neighbors, verbose, algorithm, metric, weights)
     
     fit_KNN_reg = KNN_reg.fit(self.X_train, self.Y_train)
