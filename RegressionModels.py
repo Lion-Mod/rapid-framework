@@ -36,12 +36,12 @@ class RegressionModels:
   # Mini batch SGD
   def MBSGD_regression(self, loss = 'squared_loss', penalty = 'l2', alpha = 0.0001, l1_ratio = 0.15, fit_intercept = True, epochs = 1000, tol = 0.001, shuffle = True, 
                          learning_rate = 'constant', eta0 = 0.001, power_t = 0.5, batch_size = 32, n_iter_no_change = 5, handle = None, verbose = False):
-    MBSGD_reg = MBSGDRegressor(loss, penalty, alpha, l1_ratio, fit_intercept, epochs, tol, shuffle, learning_rate, eta0, power_t, batch_size, n_iter_no_change, handle, verbose)
-    fit_MBSGD_reg = MBSGD_reg.fit(self.X_train, self.Y_train)
-    return(fit_MBSGD_reg.predict(self.X_test))
+    mbsgd_reg = MBSGDRegressor(loss, penalty, alpha, l1_ratio, fit_intercept, epochs, tol, shuffle, learning_rate, eta0, power_t, batch_size, n_iter_no_change, handle, verbose)
+    fit_mbsgd_reg = mbsgd_reg.fit(self.X_train, self.Y_train)
+    return(fit_mbsgd_reg.predict(self.X_test))
 
   # KNN
   def KNN_regression(self, weights = 'uniform', n_neighbors = 5, verbose = False, algorithm = "brute", metric = "euclidean"):
-    KNN_reg = KNeighborsRegressor(n_neighbors, verbose, algorithm, metric, weights)
-    fit_KNN_reg = KNN_reg.fit(self.X_train, self.Y_train)
-    return(fit_KNN_reg.predict(self.X_test))
+    knn_reg = KNeighborsRegressor(n_neighbors, verbose, algorithm, metric, weights)
+    fit_knn_reg = knn_reg.fit(self.X_train, self.Y_train)
+    return(fit_knn_reg.predict(self.X_test))
